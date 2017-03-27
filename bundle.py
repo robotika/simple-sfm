@@ -105,16 +105,26 @@ def test_reprojection_error():
     assert error > 0.001
 
     gfun = value_and_grad(reprojection_error)
-    for i in range(10):
-        error, gradient = gfun(points, camera, views, observations)
-        print("error   :", error)
-        print("gradient:", gradient/5000)
-        print("points  :", points)
-        points -= gradient/5000
-    return
+    error_wrapped, gradient = gfun(points, camera, views, observations)
+    assert error == error_wrapped # function is properly wrapped
 
+def test_gradient_descent():
+    points = np.zeros((1,3))
+    camera = 60, 640, 480 # fovh, w, h
+    views = np.array([[0.,0.,-1., 1.,0.,0.,0.]]) # origin, no rotation
+    observations = [ [[0], np.array([[640/2., 480/2.]])] ]
+
+    points[0][0] += 0.1
+
+    gfun = value_and_grad(reprojection_error)
+    error_before, gradient = gfun(points, camera, views, observations)
+    points -= gradient/10000
+    error_after, gradient = gfun(points, camera, views, observations)
+    assert error_after < error_before # error decreses
+    assert points[0][0] < 0.1 # point is moved towards zero
 
 if __name__ == "__main__":
     test_project()
     test_rotate()
     test_reprojection_error()
+    test_gradient_descent()
