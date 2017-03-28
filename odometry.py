@@ -23,28 +23,29 @@ def main():
     tracks = []
     cam = cv2.VideoCapture(0)
     frame_idx = 0
-    step_time, detect_time, last_time = 0.0, 0.0, clock()-33/1000
+    step_time, detect_time, last_time, sleep_time = 0.0, 0.0, clock()-33/1000, 0
     fps = 0
     while True:
         now = clock()
         fps = (15*fps + 1/(now-last_time))/16
         last_time = now
         ret, frame = cam.read()
+        sleep_time = (15*sleep_time + (clock()-now)*1000)/16
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         vis = frame.copy()
 
         if len(tracks) > 0:
             img0, img1 = prev_gray, frame_gray
-            p0 = np.float32([tr[-1] for tr in tracks]).reshape(-1, 1, 2)
+            p0 = np.float32([tr[-1] for tr in tracks]).reshape(-1, 2)
             before = clock()
             p1, st, err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
             p0r, st, err = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
             after = clock()
             step_time = (5*step_time + (after-before)*1000)/6
-            d = abs(p0-p0r).reshape(-1, 2).max(-1)
+            d = abs(p0-p0r).max(-1)
             good = d < 1
             new_tracks = []
-            for tr, (x, y), good_flag in zip(tracks, p1.reshape(-1, 2), good):
+            for tr, (x, y), good_flag in zip(tracks, p1, good):
                 if not good_flag:
                     continue
                 tr.append((x, y))
@@ -58,6 +59,7 @@ def main():
             draw_str(vis, (20, 40), 'step time: %dms' % (step_time))
             draw_str(vis, (20, 60), 'detect time: %dms' % (detect_time))
             draw_str(vis, (20, 80), 'FPS: %d' % (fps))
+            draw_str(vis, (20, 100), 'sleep time: %dms' % (sleep_time))
 
         if frame_idx % detect_interval == 0:
             before = clock()
