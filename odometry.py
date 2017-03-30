@@ -22,15 +22,16 @@ def main():
     detect_interval = 5
     tracks = []
     cam = cv2.VideoCapture(0)
+    #cam.set(cv2.CAP_PROP_SETTINGS, 0)
     frame_idx = 0
     step_time, detect_time, last_time, sleep_time = 0.0, 0.0, clock()-33/1000, 0
-    fps = 0
+    fps = 10
     while True:
         now = clock()
-        fps = (15*fps + 1/(now-last_time))/16
+        fps = (29*fps + 1/(now-last_time))/30
         last_time = now
         ret, frame = cam.read()
-        sleep_time = (15*sleep_time + (clock()-now)*1000)/16
+        sleep_time = (59*sleep_time + (clock()-now)*1000)/60
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         vis = frame.copy()
 
@@ -55,11 +56,12 @@ def main():
                 cv2.circle(vis, (x, y), 2, (0, 255, 0), -1)
             tracks = new_tracks
             cv2.polylines(vis, [np.int32(tr) for tr in tracks], False, (0, 255, 0))
-            draw_str(vis, (20, 20), 'track count: %d' % len(tracks))
-            draw_str(vis, (20, 40), 'step time: %dms' % (step_time))
-            draw_str(vis, (20, 60), 'detect time: %dms' % (detect_time))
-            draw_str(vis, (20, 80), 'FPS: %d' % (fps))
-            draw_str(vis, (20, 100), 'sleep time: %dms' % (sleep_time))
+            y, line = 20, 20
+            draw_str(vis, (20, y), 'FPS: %.1f' % (fps)); y += line
+            draw_str(vis, (20, y), 'track count: %d' % len(tracks)); y += line
+            draw_str(vis, (20, y), 'exposure time: %dms' % (sleep_time)); y += line
+            draw_str(vis, (20, y), 'track time: %dms' % (step_time)); y += line
+            draw_str(vis, (20, y), 'detect time: %dms' % (detect_time)); y += line
 
         if frame_idx % detect_interval == 0:
             before = clock()
@@ -82,6 +84,7 @@ def main():
         ch = cv2.waitKey(1)
         if ch == 27 or ch == ord('q'):
             break
+
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
