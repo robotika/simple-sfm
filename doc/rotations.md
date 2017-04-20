@@ -10,5 +10,7 @@
      Jeffrey Zhang, Daniel G. Aliaga, Mireille Boutin, Robert Insley
    - [Pose-Free Structure from Motion Using Depth From Motion Constraints](https://www.cs.purdue.edu/cgvlab/papers/aliaga/tip11.pdf)
      Ji Zhang, Mireille Boutin, and Daniel G. Aliaga
+ - [Averages of Rotations and Orientations in 3-space](http://www.cs.unc.edu/techreports/01-029.pdf)
+ - [Lie Groups for 2D and 3D Transformations](http://ethaneade.com/lie.pdf)
 
 
