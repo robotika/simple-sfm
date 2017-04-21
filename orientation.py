@@ -1,4 +1,7 @@
-import cv2
+import cv2 # features, matching, fundamental matrix
+from autograd import numpy as np # gradient
+
+import geometry
 
 class OrientationEstimator:
     'Uses a view graph of keyframes to estimate current orientation.'
@@ -6,9 +9,12 @@ class OrientationEstimator:
         pass
     def add_image(self, img):
         'Returns updated estimate of current orientation.'
-        #estimate if keyframe should be added (enough paralax)
-        #add keyframe to viewgraph
-        pass
+        #add img as keyframe to viewgraph
+        #prune the graph of old redundant keyframes
+        #filter based on triplet error, accumulate over time to support future pruning
+        #improve global orientations (fixed number of steps of gradient descent)
+        #return orientation of the last keyframe
+        return geometry.orientation()
 
 def _detect(img):
     'Returns ORB descriptors of detected features.'
@@ -30,4 +36,7 @@ def _filter(viewgraph):
 def _improve_orientations(viewgraph):
     'gradient descent; returns cumulative error'
     pass
+
+if __name__ == "__main__":
+    print('TODO: unit tests')
 
